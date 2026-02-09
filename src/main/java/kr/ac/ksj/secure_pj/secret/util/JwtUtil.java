@@ -4,6 +4,7 @@ import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
+import kr.ac.ksj.secure_pj.exception.AuthException.TokenExpiredException;
 import kr.ac.ksj.secure_pj.request_dto.CustomUserInfoDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -103,7 +104,7 @@ public class JwtUtil {
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT", e);
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT", e);
+            throw new TokenExpiredException("Access token is expired");
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT", e);
         } catch (IllegalArgumentException e) {
