@@ -104,7 +104,7 @@ public class JwtUtil {
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT", e);
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException("Access token is expired");
+            throw new TokenExpiredException("Token is expired");
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT", e);
         } catch (IllegalArgumentException e) {

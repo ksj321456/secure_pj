@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final UserCacheRepository UserCacheRepository;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
@@ -56,7 +55,7 @@ public class MemberController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshTokens(@CookieValue(name = "refreshToken", required = false) String refreshToken,
+    public ResponseEntity<?> refreshTokens(@CookieValue(name = "refreshToken") String refreshToken,
                                            HttpServletResponse response) {
 
         if (refreshToken == null || refreshToken.isEmpty()) {
@@ -68,19 +67,9 @@ public class MemberController {
                     .body("Refresh token is invalid");
         }
 
-        Claims claims = jwtUtil.parseClaims(refreshToken);
-        Long memberId = jwtUtil.getUserId(refreshToken);
-        String email = claims.get("email", String.class);
-        String name = claims.get("name", String.class);
-        RoleType roleType = RoleType.valueOf(claims.get("role", String.class));
-        CustomUserInfoDto customUserInfoDto = CustomUserInfoDto.builder()
-                .role(roleType)
-                .memberId(memberId)
-                .email(email)
-                .name(name).build();
-
-        String accessToken = jwtUtil.createAccessToken(customUserInfoDto);
-        String newRefreshToken = jwtUtil.createRefreshToken(customUserInfoDto);
+        String tokens = memberService.refresh(refreshToken);
+        String accessToken = tokens.split(" ")[0];
+        String newRefreshToken = tokens.split(" ")[1];
 
         // Refresh Token을 Secure Cookie로 설정
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", newRefreshToken)
